@@ -26,6 +26,9 @@ class ProductController extends Controller
         $this->request = $request;
     }
 
+    /**
+     * @throws \App\Exceptions\ProductStrategyNotFoundException
+     */
     public function index()
     {
         $showAllproducts = $this->showAllProductHandler->viewAllProducts($this->request->get('sort'));

@@ -7,6 +7,9 @@ use App\Collection\ProductStrategyCollection;
 use App\Entity\Product;
 use App\Repository\ProductRepository\DummyORM\DummyProductRepository;
 use App\Repository\ProductRepository\DummyORM\ProductRepository;
+use App\Repository\ProductRepository\SortProduct\SortProductByBestSells;
+use App\Repository\ProductRepository\SortProduct\SortProductByPrice;
+use App\Repository\ProductRepository\SortProduct\SortProductByReview;
 use App\Repository\ProductRepository\SortProduct\SortProductByTop;
 use App\Repository\ProductRepository\SortProduct\SortProductStrategy;
 use Illuminate\Support\ServiceProvider;
@@ -46,19 +49,19 @@ class AppServiceProvider extends ServiceProvider
             return $productCollection;
         });
 
-
         //Product Sort Strategies
         $productStrategyCollection = new ProductStrategyCollection();
-//        $productStrategyCollection->add('key-nameStrategy', new SortStrategyClassName());
+        $productStrategyCollection->add('top', new SortProductByTop());
+        $productStrategyCollection->add('price-low', new SortProductByPrice());
+        $productStrategyCollection->add('best-deals', new SortProductByBestSells());
+        $productStrategyCollection->add('review', new SortProductByReview());
 
 
         // default strategy for Products Sorter
-//        $this->app->bind(SortProductStrategy::class, DefaultSortStrategyClass);
-
+        $this->app->bind(SortProductStrategy::class, SortProductByTop::class);
         $this->app->bind(ProductStrategyCollection::class, function () use($productStrategyCollection) {
             return $productStrategyCollection;
         });
-
     }
 
     /**

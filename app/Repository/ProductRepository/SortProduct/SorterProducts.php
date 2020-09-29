@@ -4,7 +4,6 @@ namespace App\Repository\ProductRepository\SortProduct;
 
 use App\Collection\ProductCollection;
 use App\Collection\ProductStrategyCollection;
-use App\Entity\ProductInterface;
 
 /**
  * Class SorterProducts
@@ -14,89 +13,40 @@ class SorterProducts
     /** @var ProductStrategyCollection $productStrategyCollection */
     private $productStrategyCollection;
 
-    /** @var string $nameStrategy */
-    private $nameStrategy;
+    /** @var SortProductStrategy $sortProducts */
+    private $sortProducts;
 
     /**
      * @param ProductStrategyCollection $productStrategyCollection
+     * @param SortProductStrategy       $sortProducts
      */
-    public function __construct(ProductStrategyCollection $productStrategyCollection)
+    public function __construct(ProductStrategyCollection $productStrategyCollection, SortProductStrategy $sortProducts)
     {
         $this->productStrategyCollection = $productStrategyCollection;
+        $this->sortProducts              = $sortProducts;
     }
 
     /**
      * @param ProductCollection $items
      *
      * @return ProductCollection
-     * @throws \App\Exceptions\DuplicateProductIdException
      */
     public function sort(ProductCollection $items)
     {
-        switch ($this->nameStrategy) {
-            case 'top':
-                //$items = $items;
-                break;
-
-            case 'price-low':
-                //$this->sortProducts = new SortProductByPrice();
-                $items = $items->getItems();
-
-                usort($items, function (ProductInterface &$item1, ProductInterface &$item2) {
-                    return $item1->getPrice() <=> $item2->getPrice();
-                });
-
-                $newData = new ProductCollection;
-                foreach ($items as $item) {
-                    $newData->add($item);
-                }
-                $items = $newData;
-                break;
-
-            case 'best-deals':
-                $items = $items->getItems();
-
-                usort($items, function (ProductInterface $item1, ProductInterface $item2) {
-                    return $item2->getSold() <=> $item1->getSold();
-                });
-
-                $newData = new ProductCollection;
-                foreach ($items as $item) {
-                    $newData->add($item);
-                }
-                $items = $newData;
-                break;
-
-            case 'review':
-                $items = $items->getItems();
-
-                usort($items, function (ProductInterface $item1, ProductInterface $item2) {
-                    return $item2->getCountReviews() <=> $item1->getCountReviews();
-                });
-
-                $newData = new ProductCollection;
-                foreach ($items as $item) {
-                    $newData->add($item);
-                }
-                $items = $newData;
-                break;
-            default:
-                // without change $items
-                break;
-        }
-
-
-        return $items;
+        return $this->sortProducts->sort($items);
     }
 
     /**
      * Set sort strategy
      *
      * @param string $nameStrategy
+     *
+     * @throws \App\Exceptions\ProductStrategyNotFoundException
      */
     public function setSortStrategy(string $nameStrategy): void
     {
-        $this->nameStrategy = $nameStrategy;
-    }
+        $strategy = $this->productStrategyCollection->findByName($nameStrategy);
 
+        $this->sortProducts = $strategy;
+    }
 }

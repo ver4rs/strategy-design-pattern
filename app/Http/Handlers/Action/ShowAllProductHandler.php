@@ -27,10 +27,11 @@ class ShowAllProductHandler
     }
 
     /**
+     * @throws \App\Exceptions\ProductStrategyNotFoundException
+     *
      * @param string|null $nameStrategy name of strategy
      *
      * @return array
-     * @throws \App\Exceptions\DuplicateProductIdException
      */
     public function viewAllProducts(?string $nameStrategy = null)
     {
